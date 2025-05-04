@@ -1,11 +1,30 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { dummyInterviews } from "@/constants";
 import InterviewCard from "@/components/InterviewCard";
 
-const Home = () => {
+import { dummyInterviews } from "@/constants";
+
+import { getCurrentUser } from "@/lib/actions/auth.actions";
+import {
+  getInterviewsByUserId,
+  getLatestInterviews,
+} from "@/lib/actions/general.action";
+
+const Home = async () => {
+  const user = await getCurrentUser();
+
+  const [userInterviews, latestInterviews] = await Promise.all([
+    await getInterviewsByUserId(user?.id!),
+    await getLatestInterviews({ userId: user?.id! }),
+  ]);
+
+  const hasPastInterview = userInterviews && userInterviews?.length > 0;
+
+  const hasUpcomingInterviews =
+    latestInterviews && latestInterviews?.length > 0;
+
   return (
     <>
       <section className="card-cta">
@@ -34,12 +53,11 @@ const Home = () => {
         <h2>Your Interviews</h2>
 
         <div className="interviews-section">
-          {!dummyInterviews && <p>You Haven&apos;t Taken Any Interviews Yet</p>}
+          {!hasPastInterview && <p>You Haven't Taken Any Interviews Yet</p>}
 
-          {dummyInterviews &&
-            dummyInterviews?.map((interview, i) => (
-              <InterviewCard key={i} {...interview} />
-            ))}
+          {userInterviews?.map((interview, i) => (
+            <InterviewCard key={i} {...interview} />
+          ))}
         </div>
       </section>
 
@@ -47,12 +65,11 @@ const Home = () => {
         <h2>Take An Interview</h2>
 
         <div className="interviews-section">
-          {!dummyInterviews && <p>There Are No Interviews Availabel</p>}
+          {!hasUpcomingInterviews && <p>There Are No Interviews Availabel</p>}
 
-          {dummyInterviews &&
-            dummyInterviews?.map((interview, i) => (
-              <InterviewCard key={i} {...interview} />
-            ))}
+          {latestInterviews?.map((interview, i) => (
+            <InterviewCard key={i} {...interview} />
+          ))}
         </div>
       </section>
     </>

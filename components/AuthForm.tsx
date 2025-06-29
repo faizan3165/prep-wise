@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { z } from "zod";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -11,11 +13,10 @@ import {
 } from "firebase/auth";
 
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Form } from "./ui/form";
 import { toast } from "sonner";
+
 import FormField from "./FormField";
-import { useRouter } from "next/navigation";
 
 import { auth } from "@/firebase/client";
 import { signIn, signUp } from "@/lib/actions/auth.actions";
@@ -29,6 +30,8 @@ const authFormSchema = (type: FormType) => {
 };
 
 const AuthForm = ({ type }: { type: FormType }) => {
+  const [submitting, setSubmitting] = useState(false);
+
   const router = useRouter();
 
   const isSignIn = type === "sign-in";
@@ -44,6 +47,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setSubmitting(true);
     try {
       if (type === "sign-up") {
         const { name, email, password } = data;
@@ -102,6 +106,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
           error?.message
         }`
       );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -149,7 +155,13 @@ const AuthForm = ({ type }: { type: FormType }) => {
             />
 
             <Button className="btn">
-              {isSignIn ? "Sign In" : "Create Account"}
+              {isSignIn
+                ? submitting
+                  ? "Signing In..."
+                  : "Sign In"
+                : submitting
+                ? "Creating Account..."
+                : "Create Account"}
             </Button>
           </form>
         </Form>

@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { auth, db } from "@/firebase/admin";
 
 export async function signUp(params: SignUpParams) {
-  const { uid, email, name } = params;
+  const { uid, email, username } = params;
 
   try {
     const userRecord = await db.collection("users").doc(uid).get();
@@ -18,7 +18,7 @@ export async function signUp(params: SignUpParams) {
     }
 
     await db.collection("users").doc(uid).set({
-      name,
+      username,
       email,
     });
 
@@ -111,4 +111,12 @@ export async function isAuthenticated() {
   const user = await getCurrentUser();
 
   return !!user;
+}
+
+export async function signOut() {
+  const cookieStore = await cookies();
+  cookieStore.set("session", "", {
+    maxAge: 0,
+    path: "/",
+  });
 }

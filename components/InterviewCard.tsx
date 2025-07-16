@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { Button } from "./ui/button";
 
-import { getRandomInterviewCover, getTechLogos } from "@/lib/utils";
+import { getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
 import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
 

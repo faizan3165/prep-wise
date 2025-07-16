@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { auth, db } from "@/firebase/admin";
 
 export async function signUp(params: SignUpParams) {
-  const { uid, email, username } = params;
+  const { uid, email, name } = params;
 
   try {
     const userRecord = await db.collection("users").doc(uid).get();
@@ -18,7 +18,7 @@ export async function signUp(params: SignUpParams) {
     }
 
     await db.collection("users").doc(uid).set({
-      username,
+      name,
       email,
     });
 
